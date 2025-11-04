@@ -18,6 +18,8 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+from util import Stack, Queue, PriorityQueue
+
 
 class SearchProblem:
     """
@@ -87,30 +89,119 @@ def depthFirstSearch(problem: SearchProblem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    frontier = Stack()
+    explored = set()
+    start = problem.getStartState() 
+    
+    if problem.isGoalState(start):
+        return []
+    
+    frontier.push( (start, [] , 0) ) #state, path, cost
+        
+    while not frontier.isEmpty():
+        
+        state, path, cost = frontier.pop()
+        
+        if problem.isGoalState(state):
+            return path
+        if state not in explored:
+            explored.add(state)
+            for nextState, action, stepCost in problem.getSuccessors(state):
+                if nextState not in explored:
+                    newState = nextState    
+                    new_path = path + [action]
+                    newCost = cost + stepCost
+                    frontier.push((newState, new_path, newCost))
+    return []
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    frontier = Queue()
+    explored = set()
+    start = problem.getStartState()
+    if problem.isGoalState(start):
+        return []
+    frontier.push( (start, [] , 0) ) #state, path, cost
+    while not frontier.isEmpty():
+        
+        state, path, cost = frontier.pop()
+        
+        if problem.isGoalState(state):
+            return path
+        if state not in explored:
+            explored.add(state)
+            for nextState, action, stepCost in problem.getSuccessors(state):
+                if nextState not in explored:
+                    newState = nextState    
+                    new_path = path + [action]
+                    newCost = cost + stepCost
+                    frontier.push((newState, new_path, newCost))
+    return []
+    
 
-def uniformCostSearch(problem: SearchProblem):
-    """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+def uniformCostSearch(problem):
+
+    frontier = PriorityQueue()  #to programma termatizei eite otan gemisei to pque mono me diafoertika paths pros to goal eite otan adeiasei kai den yparxei lysi
+    explored = set()
+    best_g = {}
+
+    start = problem.getStartState()
+    # edge case: start is goal
+    if problem.isGoalState(start):
+        return []
+
+    # αρχικοποίηση
+    frontier.push( (start, [], 0),  priority = 0 )  
+    best_g[start] = 0
+
+    while not frontier.isEmpty():
+        state, path, cost = frontier.pop()
+
+        # skip αν έχουμε ήδη βρει καλύτερο g για αυτό το state
+        if best_g.get(state, float("inf")) < cost:
+            continue
+
+        if problem.isGoalState(state):  # 
+            return path  # path
+
+        if state in explored:
+            continue
+        explored.add(state)
+
+        for (nextState, action, stepCost) in problem.getSuccessors(state):
+            newCost = cost + stepCost
+            # αν είναι η πρώτη φορά ή βρήκαμε φθηνότερο μονοπάτι
+            if newCost < best_g.get(nextState, float("inf")):
+                best_g[nextState] = newCost
+                newPath = path + [action]
+                frontier.push( (nextState, newPath, newCost), priority = newCost )  # 
+
+    return []  # αν δεν υπάρχει λύση
+
 
 def nullHeuristic(state, problem=None):
     """
-    A heuristic function estimates the cost from the current state to the nearest
+    A heuristic function estimates the cost from the current state to the nearest#
     goal in the provided SearchProblem.  This heuristic is trivial.
     """
     return 0
 
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
+    frontier = PriorityQueue()
+    explored = set()
+    best_g = {}
+    
+    
+    start = problem.getStartState()
+    frontier.push( (start, [], 0), priority = heuristic(start, problem) )
+    best_g[start] = 0
+    if problem.isGoalState(start):
+        return []
+    while not frontier.isEmpty():
+        state, path, cost = frontier.pop()
 
 # Abbreviations
 bfs = breadthFirstSearch
