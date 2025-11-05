@@ -224,6 +224,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
                 newPath = path + [action]
                 f = newCost + heuristic(nextState, problem)
                 frontier.push( (nextState, newPath, newCost), priority = f )
+    
     return []  # αν δεν υπάρχει λύση    
         
 
