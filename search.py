@@ -202,6 +202,10 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
         return []
     while not frontier.isEmpty():
         state, path, cost = frontier.pop()
+        if(problem.isGoalState(state)):
+            return
+        
+        
 
 # Abbreviations
 bfs = breadthFirstSearch
