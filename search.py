@@ -208,7 +208,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
         
         if(problem.isGoalState(state)):
             return path
-        if state in explored:
+        if state in expl:
             
             
             continue
