@@ -323,11 +323,12 @@ class CornersProblem(search.SearchProblem):
         """
 
         successors = []
+        currentPosition, explored_corners = state
+        x,y = currentPosition
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
-            currentPosition, explored_corners = state
-            x,y = currentPosition
+            
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             # hitsWall = self.walls[nextx][nexty]
@@ -335,8 +336,13 @@ class CornersProblem(search.SearchProblem):
                 nextPosition = (nextx, nexty)
                 nextMove = action
                 stepCost = 1
-                
-                successors.append( (nextPosition, action, 1) )
+                new_explored_corners = list(explored_corners)
+                if(nextPosition in self.corners):
+                    index = self.corners.index(nextPosition)
+                    new_explored_corners[index] = True
+                new_explored_corners = tuple(new_explored_corners)
+                successors.append( ( (nextPosition, new_explored_corners), nextMove, stepCost) )
+
 
             
 
@@ -370,11 +376,25 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-    corners = problem.corners # These are the corner coordinates
+    corners = problem.corners# These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+    position, explored_corners = state
+    explored_corners = list(explored_corners)
+    remaining_corners = []
+    i = 0 #metritis gia ta unexplored corners
+    for corner in explored_corners:
+        
+        if corner == False:
+            
+            remaining_corners.append(corners[i])
+            
+        i+= 1
 
-    "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    if not remaining_corners:
+        return 0
+
+    return max(manhattanHeuristic(position,  type('dummy', (), {'goal': (cx, cy)}) ) for cx ,cy in remaining_corners)
+            #vazw  type('dummy', (), {'goal': (cx, cy)}) gia na mporesw na perastw to goal sth manhattanHeuristic
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
