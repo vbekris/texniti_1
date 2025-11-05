@@ -203,8 +203,18 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     while not frontier.isEmpty():
         state, path, cost = frontier.pop()
         if(problem.isGoalState(state)):
-            return
-        
+            return path
+        if state in explored:
+            continue
+        explored.add(state)
+        for nextState, action, stepCost in problem.getSuccessors(state):
+            newCost = cost + stepCost
+            if newCost < best_g.get(nextState, float("inf")): #το απειρο ειναι default key σε dictionary
+                best_g[nextState] = newCost
+                newPath = path + [action]
+                f = newCost + heuristic(nextState, problem)
+                frontier.push( (nextState, newPath, newCost), priority = f )
+    return []  # αν δεν υπάρχει λύση    
         
 
 # Abbreviations
